@@ -3,9 +3,9 @@ export interface MessageType {
   user_id?: number;
   message: string;
   type: string;
+  created_at?: string;
 }
 
 export interface MessageProps {
-    message: string;
-    type: string;
+    chat: MessageType;
 }

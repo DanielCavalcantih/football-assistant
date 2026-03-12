@@ -4,10 +4,12 @@ import { FieldGroup } from "@/components/ui/field";
 import { Toaster } from "@/components/ui/sonner";
 import { FormInput } from "@/custom-components";
 import { createUser, login } from "@/services/users";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner"
+import './login.css'
 
 type LoginForm = {
     name: string;
@@ -46,7 +48,13 @@ const LoginPage = () => {
                 router.push('/home');
             }
         } catch (error) {
-            console.log(error);
+            if (axios.isAxiosError(error)) {
+                const message = error.response?.data?.detail;
+
+                toast(message || "Erro na requisição");
+            } else {
+                toast("Erro inesperado");
+            }
         }
     }
 
@@ -57,72 +65,79 @@ const LoginPage = () => {
             toast('Usuário criado com sucesso!')
            }
         } catch (error) {
-            console.log(error); 
-            toast('Falha ao criar usuário!')
+            if (axios.isAxiosError(error)) {
+                const message = error.response?.data?.detail;
+
+                toast(message || "Erro na requisição");
+            } else {
+                toast("Erro inesperado");
+            }
         }      
     }
 
     return (
-        <div className="flex gap-8 justify-center items-center w-full flex-col py-32">
-            <h1 className="text-3xl font-bold">Assistente de Futebol</h1>
+        <main className="login_container min-w-screen min-h-screen flex items-center justify-center">
+            <div className="flex gap-8 justify-center items-center w-180 flex-col p-24 bg-white rounded-3xl">
+                <h1 className="text-3xl font-bold">Assistente de Futebol</h1>
 
-            <h2 className="text-2xl">{isLogin ? 'Entrar' : 'Registrar'}</h2>
+                <h2 className="text-2xl">{isLogin ? 'Entrar' : 'Registrar'}</h2>
 
-            <form 
-                action="login" 
-                className="gap-8 flex w-full justify-center items-center flex-col"
-                onSubmit={handleSubmit(isLogin ? handleLogin : handleRegister)}
-            >
-                <FieldGroup className="w-4/12">
-                    {!isLogin && (
+                <form 
+                    action="login" 
+                    className="gap-8 flex w-full justify-center items-center flex-col"
+                    onSubmit={handleSubmit(isLogin ? handleLogin : handleRegister)}
+                >
+                    <FieldGroup className="w-full">
+                        {!isLogin && (
+                            <FormInput 
+                                control={control} 
+                                className="w-full"
+                                name="name" 
+                                label="Nome" 
+                                placeholder="Digite seu nome" 
+                                required
+                            />
+                        )}
+
                         <FormInput 
                             control={control} 
-                            className="w-4/12"
-                            name="name" 
-                            label="Nome" 
-                            placeholder="Digite seu nome" 
+                            name="email"
+                            className="w-full"
+                            label="E-mail" 
+                            placeholder="Digite seu e-mail" 
                             required
+                            type="email" 
                         />
-                    )}
 
-                    <FormInput 
-                        control={control} 
-                        name="email"
-                        className="w-4/12"
-                        label="E-mail" 
-                        placeholder="Digite seu e-mail" 
-                        required
-                        type="email" 
-                    />
+                        <FormInput 
+                            control={control} 
+                            name="password" 
+                            className="w-full"
+                            label="Senha" 
+                            placeholder="Digite sua senha" 
+                            required 
+                            type="password"
+                        />
+                    </FieldGroup>
 
-                    <FormInput 
-                        control={control} 
-                        name="password" 
-                        className="w-4/12"
-                        label="Senha" 
-                        placeholder="Digite sua senha" 
-                        required 
-                        type="password"
-                    />
-                </FieldGroup>
+                    <p>
+                        {isLogin ? 'Ainda não possui conta?' : 'Já possui conta?' }
+                        <span 
+                            className="cursor-pointer text-blue-500" 
+                            onClick={() => setFormType(isLogin ? FORM_TYPE.register : FORM_TYPE.login)}
+                        >
+                            {isLogin ? ' Cadastre-se' : ' Fazer login'}
+                        </span>
+                    </p>
 
-                <p>
-                    {isLogin ? 'Ainda não possui conta?' : 'Já possui conta?' }
-                    <span 
-                        className="cursor-pointer text-blue-500" 
-                        onClick={() => setFormType(isLogin ? FORM_TYPE.register : FORM_TYPE.login)}
-                    >
-                        {isLogin ? ' Cadastre-se' : ' Fazer login'}
-                    </span>
-                </p>
-
-                <div className="flex gap-4">
-                    <Button onClick={handleBack} variant="outline">Voltar</Button>
-                    <Button type="submit">{isLogin ? 'Entrar' : 'Registrar'}</Button>
-                </div>
-            </form>
-            <Toaster />
-        </div>
+                    <div className="flex gap-4">
+                        <Button onClick={handleBack} variant="outline">Voltar</Button>
+                        <Button type="submit">{isLogin ? 'Entrar' : 'Registrar'}</Button>
+                    </div>
+                </form>
+                <Toaster />
+            </div>
+        </main>
     );
 };
 

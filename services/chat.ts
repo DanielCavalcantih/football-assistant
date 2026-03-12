@@ -8,7 +8,6 @@ export const getMessages = async () => {
             Authorization: `Bearer ${token}`
         } 
     });
-    console.log(response);
     
     return response.data;
 };
@@ -21,7 +20,6 @@ export const sendMessage = async ({ message }: { message: string }) => {
             Authorization: `Bearer ${token}`
         }
     });
-    console.log(response);
     
     return response.data;
 };
@@ -34,7 +32,6 @@ export const clearMessages = async () => {
             Authorization: `Bearer ${token}`
         }
     });
-    console.log(response);
     
     return response.data;
 }
